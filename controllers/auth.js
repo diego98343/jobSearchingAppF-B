@@ -45,20 +45,28 @@ const login = async (req, res) => {
 
 
 const updateUser = async (req, res) => {
+  //first we get the values that we want o modify 
   const { email, name, lastName, location } = req.body
+  //then if they values are not found we throw an error;
   if (!email || !name || !lastName || !location) {
     throw new BadRequestError('please provide all values')
   }
-
+  //we find the user by id 
   const user = await User.findOne({ _id: req.user.userId });
+
+  // then we get the values for the user and we set them equal to 
+  // the input values
 
   user.email = email;
   user.name = name;
   user.lastName = lastName;
   user.location = location;
 
+  //we save all the chamges
   await user.save();
 
+  // and finally we retrieve the json with values and a new token because
+  // some values were modified
   const token = user.createJWT();
   res.status(StatusCodes.OK).json({
     user: {
