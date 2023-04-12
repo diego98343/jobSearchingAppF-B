@@ -4,12 +4,15 @@ const { BadRequestError, NotFoundError } = require('../errors')
 
 const getAllJobs = async (req, res) => {
 
+  // Create a constand with the variable we are going to use
   const { search, status, jobType, sort } = req.query
 
+  // then we create a queryObject that takes the jobs created by user ID
   const queryObject = {
     createdBy: req.user.userId
   }
 
+  //create conditions based on the user search input
   if (search) {
     queryObject.position = {$regex:search,$options:'i'}
   }
@@ -22,17 +25,24 @@ const getAllJobs = async (req, res) => {
     queryObject.jobType = jobType;
   }
 
-
-
-
-
-
-
- 
-    
-
-
   let result = Job.find(queryObject);
+
+ //sort 
+    if (sort === 'latest') {
+    result = result.sort('-createdAt');
+  }
+  if (sort === 'oldest') {
+    result = result.sort('createdAt');
+  }
+  if (sort === 'a-z') {
+    result = result.sort('position');
+  }
+  if (sort === 'z-a') {
+    result = result.sort('-position');
+  }
+
+
+
 
   const jobs = await result
 
