@@ -2,6 +2,7 @@ const Job = require('../models/Job')
 const { StatusCodes } = require('http-status-codes')
 const { BadRequestError, NotFoundError } = require('../errors')
 
+
 const getAllJobs = async (req, res) => {
 
   // Create a constand with the variable we are going to use
@@ -115,10 +116,18 @@ const deleteJob = async (req, res) => {
   res.status(StatusCodes.OK).send()
 }
 
+const showStats = async (req, res) => {
+  res
+    .status(StatusCodes.OK)
+    .json({ defaultStats: {}, monthlyApplications: [] });
+}
+
+
 module.exports = {
   createJob,
   deleteJob,
   getAllJobs,
   updateJob,
   getJob,
+  showStats
 }
