@@ -119,9 +119,30 @@ const deleteJob = async (req, res) => {
 }
 
 const showStats = async (req, res) => {
-  res
-    .status(StatusCodes.OK)
-    .json({ defaultStats: {}, monthlyApplications: [] });
+
+  let stats = await Job.aggregate([
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    //we can group the information base on any property in any case we did it with status
+    { $group: { _id: '$status', count: { $sum: 1 } } }
+  ]);
+
+  // we reduce the values when get from stats variable to make it friendly to the front end to read it 
+  stats = stats.reduce((accumutator,current) => {
+    const { _id: title, count } = current
+    accumutator[title] = count;
+    return accumutator;
+  }, {});
+
+  const defaultStats = {
+    pending: stats.pending || 0,
+    interview: stats.interview || 0,
+    declined: stats.declined || 0   
+  };
+
+  console.log(stats);
+
+  //make sure to pass the defaulStats property in json
+  res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications: [] });
 }
 
 
