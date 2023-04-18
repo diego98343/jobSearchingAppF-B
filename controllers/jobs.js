@@ -139,7 +139,25 @@ const showStats = async (req, res) => {
     declined: stats.declined || 0   
   };
 
-  console.log(stats);
+// we are calculating the montly applications
+  let monthlyApplications = await Job.aggregate([
+    //we match the information based on the user login ID
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    //we can group the information base on any property in any case we did it with status
+    {
+      $group: {
+        _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+        count: { $sum: 1 }
+      },
+    },
+    //then we sort it by year and month and give it a limit of 6 months
+    { $sort: { '_id.year': -1, '_id.month': -1 } },
+    { $limit: 6 }
+  ]);
+
+
+
+  console.log(monthlyApplications);
 
   //make sure to pass the defaulStats property in json
   res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications: [] });
