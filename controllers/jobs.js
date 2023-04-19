@@ -120,12 +120,14 @@ const deleteJob = async (req, res) => {
 
 const showStats = async (req, res) => {
 
+
+  ////////////////////////////////////////
+
   let stats = await Job.aggregate([
     { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
     //we can group the information base on any property in any case we did it with status
     { $group: { _id: '$status', count: { $sum: 1 } } }
   ]);
-
   // we reduce the values when get from stats variable to make it friendly to the front end to read it 
   stats = stats.reduce((accumutator,current) => {
     const { _id: title, count } = current
@@ -138,6 +140,11 @@ const showStats = async (req, res) => {
     interview: stats.interview || 0,
     declined: stats.declined || 0   
   };
+
+    ////////////////////////////////////////
+  
+  
+    ////////////////////////////////////////
 
 // we are calculating the montly applications
   let monthlyApplications = await Job.aggregate([
@@ -155,12 +162,24 @@ const showStats = async (req, res) => {
     { $limit: 6 }
   ]);
 
+    monthlyApplications = monthlyApplications.map((item) => {
 
+      const {
+        _id: { year, month },
+        count
+      } = item
+
+    // to use momemt() we need to install the moment npm packe
+     const date = moment().month(month - 1).year(year).format('MMM Y')
+     return {date, count}
+  })
+
+  ////////////////////////////////////////
 
   console.log(monthlyApplications);
 
   //make sure to pass the defaulStats property in json
-  res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications: [] });
+  res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications });
 }
 
 
