@@ -1,10 +1,13 @@
 {
+  "homepage": "http://diego98343.github.io/jobSearchingAppF-B",
   "name": "06-jobs-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "predeploy":"npm run build",
+    "deploy":"gh-pages -d build",
     "dev": "nodemon app.js"
   },
   "author": "",
@@ -28,6 +31,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "gh-pages": "^5.0.0",
     "nodemon": "^2.0.9"
   },
   "engines": {
